@@ -1,0 +1,326 @@
+// ============================================================
+// SEAPEDIA - Database Schema (Prisma + SQLite)
+// ============================================================
+// CATATAN PENTING:
+// SQLite tidak mendukung native `enum` di Prisma, sehingga semua
+// field "pilihan tetap" (role, status, tipe) dibuat bertipe String
+// dan divalidasi di application layer (lihat src/constants/enums.js
+// pada langkah berikutnya). Daftar nilai valid didokumentasikan
+// sebagai komentar tepat di atas field/model terkait.
+// ============================================================
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ------------------------------------------------------------
+// AUTH & ROLE
+// ------------------------------------------------------------
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  roles         UserRole[]
+  wallet        Wallet?
+  addresses     Address[]
+  store         Store?
+  cart          Cart?
+  ordersAsBuyer Order[]       @relation("BuyerOrders")
+  deliveryJobs  DeliveryJob[] @relation("DriverJobs")
+  reviews       Review[]
+}
+
+/// role bernilai salah satu dari: "ADMIN" | "SELLER" | "BUYER" | "DRIVER"
+/// Satu username non-admin boleh punya lebih dari satu baris (multi-role).
+model UserRole {
+  id     String @id @default(cuid())
+  userId String
+  role   String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, role])
+  @@index([userId])
+}
+
+// ------------------------------------------------------------
+// WALLET (dipakai bersama oleh Buyer/Seller/Driver karena satu
+// username bisa punya saldo gabungan dari beberapa peran)
+// ------------------------------------------------------------
+
+model Wallet {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  balance   Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions WalletTransaction[]
+}
+
+/// type bernilai salah satu dari:
+/// "TOPUP" | "PAYMENT" | "REFUND" | "SELLER_INCOME" |
+/// "SELLER_INCOME_REVERSAL" | "DRIVER_EARNING"
+model WalletTransaction {
+  id           String   @id @default(cuid())
+  walletId     String
+  type         String
+  amount       Int
+  balanceAfter Int
+  orderId      String?
+  description  String
+  createdAt    DateTime @default(now())
+
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  order  Order? @relation(fields: [orderId], references: [id])
+
+  @@index([walletId])
+  @@index([orderId])
+}
+
+model Address {
+  id            String   @id @default(cuid())
+  userId        String
+  label         String
+  recipientName String
+  phone         String
+  fullAddress   String
+  city          String
+  postalCode    String
+  isDefault     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders Order[]
+
+  @@index([userId])
+}
+
+// ------------------------------------------------------------
+// SELLER: STORE & PRODUCT
+// ------------------------------------------------------------
+
+model Store {
+  id          String   @id @default(cuid())
+  ownerId     String   @unique
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner    User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  products Product[]
+  orders   Order[]
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  storeId     String
+  name        String
+  description String
+  price       Int
+  stock       Int      @default(0)
+  imageEmoji  String   @default("🪴")
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  store      Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+
+  @@index([storeId])
+}
+
+// ------------------------------------------------------------
+// BUYER: CART (aturan single-store checkout)
+// ------------------------------------------------------------
+
+model Cart {
+  id      String  @id @default(cuid())
+  buyerId String  @unique
+  storeId String?
+
+  buyer User       @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+  items CartItem[]
+}
+
+model CartItem {
+  id        String @id @default(cuid())
+  cartId    String
+  productId String
+  quantity  Int    @default(1)
+
+  cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, productId])
+}
+
+// ------------------------------------------------------------
+// DISKON: VOUCHER & PROMO
+// ------------------------------------------------------------
+
+/// discountType bernilai salah satu dari: "PERCENT" | "FIXED"
+model Voucher {
+  id           String   @id @default(cuid())
+  code         String   @unique
+  discountType String
+  value        Int
+  maxDiscount  Int?
+  usageLimit   Int
+  usedCount    Int      @default(0)
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  orders Order[]
+}
+
+/// discountType bernilai salah satu dari: "PERCENT" | "FIXED"
+model Promo {
+  id           String   @id @default(cuid())
+  code         String   @unique
+  discountType String
+  value        Int
+  maxDiscount  Int?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  orders Order[]
+}
+
+// ------------------------------------------------------------
+// ORDER (alur transaksi utama)
+// ------------------------------------------------------------
+
+/// status bernilai salah satu dari:
+/// "SEDANG_DIKEMAS" | "MENUNGGU_PENGIRIM" | "SEDANG_DIKIRIM" |
+/// "PESANAN_SELESAI" | "DIKEMBALIKAN"
+///
+/// deliveryMethod bernilai salah satu dari: "INSTANT" | "NEXT_DAY" | "REGULAR"
+/// discountSource bernilai salah satu dari: "VOUCHER" | "PROMO" | null
+model Order {
+  id              String    @id @default(cuid())
+  orderNumber     String    @unique
+  buyerId         String
+  storeId         String
+  addressId       String?
+  status          String    @default("SEDANG_DIKEMAS")
+  deliveryMethod  String
+  subtotal        Int
+  discountAmount  Int       @default(0)
+  discountSource  String?
+  voucherId       String?
+  promoId         String?
+  deliveryFee     Int
+  ppnAmount       Int
+  totalAmount     Int
+  addressSnapshot String
+  processedAt     DateTime?
+  overdueDeadline DateTime?
+  refundedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  buyer   User     @relation("BuyerOrders", fields: [buyerId], references: [id])
+  store   Store    @relation(fields: [storeId], references: [id])
+  address Address? @relation(fields: [addressId], references: [id], onDelete: SetNull)
+  voucher Voucher? @relation(fields: [voucherId], references: [id])
+  promo   Promo?   @relation(fields: [promoId], references: [id])
+
+  items         OrderItem[]
+  statusHistory OrderStatusHistory[]
+  deliveryJob   DeliveryJob?
+  walletTxns    WalletTransaction[]
+
+  @@index([buyerId])
+  @@index([storeId])
+  @@index([status])
+}
+
+model OrderItem {
+  id              String @id @default(cuid())
+  orderId         String
+  productId       String
+  productName     String
+  priceAtPurchase Int
+  quantity        Int
+  subtotal        Int
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+}
+
+model OrderStatusHistory {
+  id        String   @id @default(cuid())
+  orderId   String
+  status    String
+  note      String?
+  createdAt DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
+
+// ------------------------------------------------------------
+// DRIVER: DELIVERY JOB
+// ------------------------------------------------------------
+
+/// status bernilai salah satu dari: "AVAILABLE" | "TAKEN" | "COMPLETED"
+model DeliveryJob {
+  id          String    @id @default(cuid())
+  orderId     String    @unique
+  driverId    String?
+  status      String    @default("AVAILABLE")
+  earning     Int?
+  takenAt     DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  order  Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  driver User? @relation("DriverJobs", fields: [driverId], references: [id])
+
+  @@index([status])
+  @@index([driverId])
+}
+
+// ------------------------------------------------------------
+// PUBLIC APPLICATION REVIEW
+// ------------------------------------------------------------
+
+model Review {
+  id        String   @id @default(cuid())
+  name      String
+  rating    Int
+  comment   String
+  userId    String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([createdAt])
+}
+
+// ------------------------------------------------------------
+// SYSTEM CLOCK (untuk simulasi "hari berikutnya" - Level 6)
+// Singleton: selalu pakai row dengan id = 1
+// ------------------------------------------------------------
+
+model SystemClock {
+  id         Int      @id @default(1)
+  virtualNow DateTime @default(now())
+}
