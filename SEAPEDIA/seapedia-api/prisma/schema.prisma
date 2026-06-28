@@ -1,16 +1,18 @@
 // ============================================================
-// SEAPEDIA - Database Schema (Prisma + SQLite)
+// SEAPEDIA - Database Schema (Prisma + PostgreSQL)
 // ============================================================
 // CATATAN PENTING:
-// SQLite tidak mendukung native `enum` di Prisma, sehingga semua
-// field "pilihan tetap" (role, status, tipe) dibuat bertipe String
-// dan divalidasi di application layer (lihat src/constants/enums.js
-// pada langkah berikutnya). Daftar nilai valid didokumentasikan
-// sebagai komentar tepat di atas field/model terkait.
+// Field "pilihan tetap" (role, status, tipe) dibuat bertipe String,
+// bukan enum native Postgres, supaya konsisten dengan kode yang sudah
+// ditulis dan supaya skema ini tetap portable (pernah jalan di SQLite
+// untuk pengembangan awal sebelum pindah ke Postgres untuk deployment).
+// Validasi nilai dilakukan di application layer lewat
+// src/constants/enums.js. Daftar nilai valid didokumentasikan sebagai
+// komentar tepat di atas field/model terkait.
 // ============================================================
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

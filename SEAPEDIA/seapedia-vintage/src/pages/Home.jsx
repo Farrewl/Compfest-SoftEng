@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { RootButton, OrganicCard, OrganicInput } from '../components/UI';
+import { getReviews, submitReview } from '../api/reviews';
 
 // Data produk sementara (Dummy) sesuai syarat Level 1 jika backend belum ada
 const DUMMY_PRODUCTS = [
@@ -17,16 +18,47 @@ export default function Home() {
   // State untuk menyimpan data ulasan
   const [review, setReview] = useState({ name: "", rating: 5, comment: "" });
   const [reviews, setReviews] = useState([]);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(true);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [reviewError, setReviewError] = useState("");
 
-  // Fungsi untuk menangani pengiriman ulasan
-  const handleReviewSubmit = (e) => {
+  // Ambil ulasan asli dari backend setiap kali halaman ini dibuka
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const res = await getReviews({ limit: 10 });
+        if (isMounted) setReviews(res.data.items);
+      } catch {
+        // Gagal memuat ulasan tidak perlu menghentikan seluruh halaman
+      } finally {
+        if (isMounted) setIsLoadingReviews(false);
+      }
+    })();
+    return () => { isMounted = false; };
+  }, []);
+
+  // Fungsi untuk menangani pengiriman ulasan - sekarang benar-benar tersimpan di database
+  const handleReviewSubmit = async (e) => {
     e.preventDefault();
     if (!review.comment) return; // Mencegah ulasan kosong
-    
-    // Menambahkan ulasan baru ke urutan paling atas
-    setReviews([review, ...reviews]);
-    // Mereset form kembali ke awal
-    setReview({ name: "", rating: 5, comment: "" });
+    setIsSubmittingReview(true);
+    setReviewError("");
+    try {
+      const res = await submitReview(review);
+      // Menambahkan ulasan baru ke urutan paling atas
+      setReviews([res.data.data, ...reviews]);
+      // Mereset form kembali ke awal
+      setReview({ name: "", rating: 5, comment: "" });
+    } catch (err) {
+      setReviewError(
+        err?.response?.data?.errors?.[0]?.message ||
+        err?.response?.data?.message ||
+        "Gagal mengirim ulasan, coba lagi."
+      );
+    } finally {
+      setIsSubmittingReview(false);
+    }
   };
 
   return (
@@ -46,7 +78,7 @@ export default function Home() {
           className="text-4xl md:text-6xl text-[#4A3B32] mb-6 font-bold tracking-wide"
           style={{ fontFamily: 'Playfair Display' }}
         >
-          Welcome
+          Jelajahi Akar Kehidupan
         </motion.h1>
         <p className="text-lg text-[#8B5A2B] max-w-2xl mx-auto font-medium leading-relaxed">
           Selamat datang di SEAPEDIA. Marketplace terintegrasi dengan ekosistem multi-peran (Seller, Buyer, Driver). 
@@ -127,22 +159,30 @@ export default function Home() {
               onChange={(e) => setReview({...review, comment: e.target.value})} 
               required={true}
             />
-            <RootButton type="submit" className="w-full mt-6">Tinggalkan Jejak</RootButton>
+            {reviewError && <p className="text-red-600 text-xs font-bold mt-1">{reviewError}</p>}
+            <RootButton type="submit" className="w-full mt-6" disabled={isSubmittingReview}>
+              {isSubmittingReview ? 'Mengirim...' : 'Tinggalkan Jejak'}
+            </RootButton>
           </form>
           
           {/* Daftar Ulasan */}
           <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-            {reviews.length === 0 ? (
+            {isLoadingReviews ? (
+              <div className="h-full flex flex-col items-center justify-center text-[#8B5A2B] italic text-center opacity-70 py-10">
+                <span className="text-4xl mb-2 animate-pulse">🍃</span>
+                <p>Memuat jejak para pengembara...</p>
+              </div>
+            ) : reviews.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-[#8B5A2B] italic text-center opacity-70 py-10">
                 <span className="text-4xl mb-2">🍃</span>
                 <p>Belum ada ulasan.<br/>Jadilah daun pertama yang gugur meninggalkan cerita!</p>
               </div>
             ) : (
-              reviews.map((r, idx) => (
+              reviews.map((r) => (
                 <motion.div 
                   initial={{ x: 20, opacity: 0 }} 
                   animate={{ x: 0, opacity: 1 }} 
-                  key={idx} 
+                  key={r.id} 
                   className="bg-white p-5 rounded-xl rounded-br-[2rem] shadow-sm border-l-4 border-[#3B5E3C]"
                 >
                   <div className="flex justify-between items-center mb-2">
