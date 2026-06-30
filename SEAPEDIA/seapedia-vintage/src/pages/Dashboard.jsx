@@ -21,7 +21,7 @@ export default function Dashboard() {
         <OrganicCard className="max-w-md text-center border-red-500/40 bg-white/95">
           <span className="text-6xl block mb-4">🔒</span>
           <h2 className="text-2xl font-bold text-red-700 mb-2" style={{ fontFamily: 'Playfair Display' }}>Akses Ditolak</h2>
-          <p className="text-[#4A3B32] mb-6 text-sm">Anda harus masuk terlebih dahulu.</p>
+          <p className="text-[#492828] mb-6 text-sm">Anda harus masuk terlebih dahulu.</p>
           <RootButton onClick={() => navigate('/login')} className="w-full">Ke Gerbang Masuk</RootButton>
         </OrganicCard>
       </div>
@@ -65,9 +65,18 @@ export default function Dashboard() {
 
   const renderRoleSpecificContent = () => {
     switch (activeRole) {
-      case 'SELLER': return (<div><h3 className="text-xl font-bold text-[#3B5E3C]" style={{ fontFamily: 'Playfair Display' }}>🌾 Gudang & Manajemen Produk</h3><p className="text-sm mt-2 text-[#4A3B32]">Area pengelolaan stok penjual akan hadir di Level 2.</p></div>);
-      case 'BUYER': return (<div><h3 className="text-xl font-bold text-[#8B5A2B]" style={{ fontFamily: 'Playfair Display' }}>🛒 Keranjang Pengembara</h3><p className="text-sm mt-2 text-[#4A3B32]">Area checkout dan daftar belanja akan hadir di Level 3.</p></div>);
-      case 'DRIVER': return (<div><h3 className="text-xl font-bold text-[#4A3B32]" style={{ fontFamily: 'Playfair Display' }}>🐎 Papan Tugas Pengiriman</h3><p className="text-sm mt-2 text-[#4A3B32]">Area navigasi logistik kurir akan hadir di Level 5.</p></div>);
+      case 'SELLER': return (
+        <div>
+          <h3 className="text-xl font-bold text-[#656D3F]" style={{ fontFamily: 'Playfair Display' }}>🌾 Gudang & Manajemen Produk</h3>
+          <p className="text-sm mt-2 mb-4 text-[#492828]">Kelola profil toko dan daftar produk Anda di sini.</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <RootButton onClick={() => navigate('/seller/store')} className="text-sm">🏪 Profil Toko</RootButton>
+            <RootButton variant="secondary" onClick={() => navigate('/seller/products')} className="text-sm">🪴 Kelola Produk</RootButton>
+          </div>
+        </div>
+      );
+      case 'BUYER': return (<div><h3 className="text-xl font-bold text-[#84934A]" style={{ fontFamily: 'Playfair Display' }}>🛒 Keranjang Pengembara</h3><p className="text-sm mt-2 text-[#492828]">Area checkout dan daftar belanja akan hadir di Level 3.</p></div>);
+      case 'DRIVER': return (<div><h3 className="text-xl font-bold text-[#492828]" style={{ fontFamily: 'Playfair Display' }}>🐎 Papan Tugas Pengiriman</h3><p className="text-sm mt-2 text-[#492828]">Area navigasi logistik kurir akan hadir di Level 5.</p></div>);
       default: return <p>Peran tidak valid.</p>;
     }
   };
@@ -78,18 +87,18 @@ export default function Dashboard() {
         
         {/* KOLOM KIRI: SETTING PROFIL & TAMBAH PERAN */}
         <div className="md:col-span-1 space-y-6">
-          <OrganicCard className="bg-white/95 border-l-4 border-[#8B5A2B]">
-            <div className="text-center pb-6 border-b-2 border-[#8B5A2B]/20">
-              <div className="w-20 h-20 bg-[#8B5A2B]/10 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-[#8B5A2B]/30 text-4xl">🧝🏽‍♂️</div>
-              <h2 className="text-xl font-bold text-[#4A3B32]" style={{ fontFamily: 'Playfair Display' }}>{user.username}</h2>
-              <p className="text-xs text-[#8B5A2B] font-mono">{user.email}</p>
+          <OrganicCard className="bg-white/95 border-l-4 border-[#84934A]">
+            <div className="text-center pb-6 border-b-2 border-[#84934A]/20">
+              <div className="w-20 h-20 bg-[#84934A]/10 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-[#84934A]/30 text-4xl">🧝🏽‍♂️</div>
+              <h2 className="text-xl font-bold text-[#492828]" style={{ fontFamily: 'Playfair Display' }}>{user.username}</h2>
+              <p className="text-xs text-[#84934A] font-mono">{user.email}</p>
             </div>
 
-            <div className="py-4 border-b-2 border-[#8B5A2B]/20">
-              <p className="text-xs font-bold text-[#8B5A2B] uppercase tracking-wider mb-2">Semua Peran Anda:</p>
+            <div className="py-4 border-b-2 border-[#84934A]/20">
+              <p className="text-xs font-bold text-[#84934A] uppercase tracking-wider mb-2">Semua Peran Anda:</p>
               <div className="flex flex-wrap gap-2">
                 {user.roles.map(r => (
-                  <span key={r} className={`px-3 py-1 text-xs font-bold rounded-full border ${activeRole === r ? 'bg-[#8B5A2B] text-[#F4ECD8] border-[#8B5A2B]' : 'bg-transparent text-[#4A3B32] border-[#8B5A2B]/30'}`}>
+                  <span key={r} className={`px-3 py-1 text-xs font-bold rounded-full border ${activeRole === r ? 'bg-[#84934A] text-[#ECECEC] border-[#84934A]' : 'bg-transparent text-[#492828] border-[#84934A]/30'}`}>
                     {ROLE_LABELS[r] || r} {activeRole === r && '• Aktif'}
                   </span>
                 ))}
@@ -98,18 +107,18 @@ export default function Dashboard() {
 
             {/* FORM TAMBAH PERAN JIKA MASIH ADA ROLE YANG BELUM DIMILIKI */}
             {unownedRoles.length > 0 && (
-              <form onSubmit={handleAddNewRole} className="py-4 border-b-2 border-[#8B5A2B]/20">
-                <p className="text-xs font-bold text-[#3B5E3C] uppercase tracking-wider mb-2">Tambahkan Peran Baru:</p>
+              <form onSubmit={handleAddNewRole} className="py-4 border-b-2 border-[#84934A]/20">
+                <p className="text-xs font-bold text-[#656D3F] uppercase tracking-wider mb-2">Tambahkan Peran Baru:</p>
                 {errorMessage && <p className="text-red-600 text-xs font-bold mb-2">{errorMessage}</p>}
                 <div className="flex gap-2">
                   <select 
-                    className="flex-grow bg-[#F4ECD8] border border-[#8B5A2B]/50 text-xs p-2 outline-none text-[#4A3B32] font-bold rounded"
+                    className="flex-grow bg-[#ECECEC] border border-[#84934A]/50 text-xs p-2 outline-none text-[#492828] font-bold rounded"
                     value={newRole} onChange={(e) => setNewRole(e.target.value)}
                   >
                     <option value="" disabled>-- Pilih Peran --</option>
                     {unownedRoles.map(role => <option key={role} value={role}>{ROLE_LABELS[role]}</option>)}
                   </select>
-                  <button type="submit" disabled={isSubmitting} className="bg-[#3B5E3C] text-white px-3 py-1 text-xs font-bold rounded hover:bg-[#2A432A] transition-colors disabled:opacity-50">
+                  <button type="submit" disabled={isSubmitting} className="bg-[#656D3F] text-white px-3 py-1 text-xs font-bold rounded hover:bg-[#2A432A] transition-colors disabled:opacity-50">
                     {isSubmitting ? '...' : 'Tambah'}
                   </button>
                 </div>
@@ -117,10 +126,10 @@ export default function Dashboard() {
             )}
 
             <div className="pt-4">
-              <p className="text-xs font-bold text-[#8B5A2B] uppercase tracking-wider mb-1">Pundi Saldo Keuangan:</p>
+              <p className="text-xs font-bold text-[#84934A] uppercase tracking-wider mb-1">Pundi Saldo Keuangan:</p>
               <div className="flex items-center gap-2">
                 <span className="text-2xl">🪙</span>
-                <span className="text-xl font-bold text-[#8B5A2B] font-mono">
+                <span className="text-xl font-bold text-[#84934A] font-mono">
                   {user.walletBalance.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}
                 </span>
               </div>
@@ -135,7 +144,7 @@ export default function Dashboard() {
               </RootButton>
             ) : (
               <OrganicCard className="bg-white/95 p-4">
-                <p className="text-xs font-bold text-[#8B5A2B] mb-3 uppercase tracking-wider">Pilih peran aktif:</p>
+                <p className="text-xs font-bold text-[#84934A] mb-3 uppercase tracking-wider">Pilih peran aktif:</p>
                 {errorMessage && <p className="text-red-600 text-xs font-bold mb-2">{errorMessage}</p>}
                 <div className="flex flex-col gap-2">
                   {user.roles.map(r => (
@@ -144,13 +153,13 @@ export default function Dashboard() {
                       onClick={() => handleSwitchRole(r)}
                       disabled={isSubmitting}
                       className={`text-xs font-bold p-2 rounded border-2 transition-colors disabled:opacity-50 ${
-                        r === activeRole ? 'bg-[#8B5A2B] text-[#F4ECD8] border-[#8B5A2B]' : 'border-[#8B5A2B]/30 text-[#4A3B32] hover:border-[#8B5A2B]'
+                        r === activeRole ? 'bg-[#84934A] text-[#ECECEC] border-[#84934A]' : 'border-[#84934A]/30 text-[#492828] hover:border-[#84934A]'
                       }`}
                     >
                       {ROLE_LABELS[r] || r} {r === activeRole && '(sedang aktif)'}
                     </button>
                   ))}
-                  <button onClick={() => setShowRoleSwitcher(false)} className="text-xs text-[#8B5A2B] underline mt-1">Batal</button>
+                  <button onClick={() => setShowRoleSwitcher(false)} className="text-xs text-[#84934A] underline mt-1">Batal</button>
                 </div>
               </OrganicCard>
             )
@@ -161,9 +170,9 @@ export default function Dashboard() {
         <div className="md:col-span-2">
           <OrganicCard className="bg-white/90 h-full flex flex-col justify-between">
             <div>
-              <div className="flex justify-between items-center border-b-2 border-[#8B5A2B]/20 pb-4 mb-6">
-                <h2 className="text-2xl font-bold text-[#4A3B32]" style={{ fontFamily: 'Playfair Display' }}>Ruang Kerja Privat</h2>
-                <span className="px-4 py-1 text-xs font-extrabold uppercase bg-[#4A3B32] text-[#F4ECD8] rounded-tl-xl rounded-br-xl shadow-sm">
+              <div className="flex justify-between items-center border-b-2 border-[#84934A]/20 pb-4 mb-6">
+                <h2 className="text-2xl font-bold text-[#492828]" style={{ fontFamily: 'Playfair Display' }}>Ruang Kerja Privat</h2>
+                <span className="px-4 py-1 text-xs font-extrabold uppercase bg-[#492828] text-[#ECECEC] rounded-tl-xl rounded-br-xl shadow-sm">
                   Aktif: {ROLE_LABELS[activeRole] || activeRole}
                 </span>
               </div>

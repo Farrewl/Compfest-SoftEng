@@ -111,10 +111,10 @@ export default function Login() {
           {/* TAHAPAN 1: FORM LOGIN */}
           {step === 'login' && (
             <motion.form key="login" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onSubmit={handleLoginSubmit}>
-              <h2 className="text-3xl font-bold text-[#4A3B32] mb-2 text-center" style={{ fontFamily: 'Playfair Display' }}>
+              <h2 className="text-3xl font-bold text-[#492828] mb-2 text-center" style={{ fontFamily: 'Playfair Display' }}>
                 Gerbang Masuk
               </h2>
-              <p className="text-sm text-center text-[#8B5A2B] mb-6">Masuk untuk mengelola peran dan transaksi Anda</p>
+              <p className="text-sm text-center text-[#84934A] mb-6">Masuk untuk mengelola peran dan transaksi Anda</p>
               
               {errorMessage && <p className="text-red-600 text-sm font-bold text-center mb-4">{errorMessage}</p>}
               
@@ -122,18 +122,22 @@ export default function Login() {
               <OrganicInput label="Kata Sandi" type="password" placeholder="••••••••" value={formData.password} onChange={(e) => handleChange(e, 'password')} />
               
               <RootButton type="submit" className="w-full mt-6" disabled={isSubmitting}>
-                {isSubmitting ? 'Memeriksa...' : 'Masuk Aplikasi'}
+                {isSubmitting ? 'Memeriksa...' : 'Masuk'}
               </RootButton>
               
-              <p className="text-sm text-center text-[#4A3B32] mt-6">
+              <p className="text-sm text-center text-[#492828] mt-6">
                 Belum memiliki akun?{' '}
-                <button type="button" onClick={() => { setStep('register'); setErrorMessage(''); }} className="font-bold text-[#8B5A2B] underline hover:text-[#4A3B32]">
+                <button type="button" onClick={() => { setStep('register'); setErrorMessage(''); }} className="font-bold text-[#84934A] underline hover:text-[#492828]">
                   Daftar di Sini
                 </button>
               </p>
 
-              <p className="text-xs text-center text-[#8B5A2B]/70 mt-4">
+              <p className="text-xs text-center text-[#84934A]/70 mt-4">
                 Coba akun demo: <span className="font-mono">pengembara_akar</span> / <span className="font-mono">Pengembara123!</span>
+              </p>
+
+              <p className="text-xs text-center text-[#84934A]/70 mt-2">
+                Akun admin: <span className="font-mono">admin_akar</span> / <span className="font-mono">Admin123!</span>
               </p>
             </motion.form>
           )}
@@ -141,10 +145,10 @@ export default function Login() {
           {/* TAHAPAN 2: FORM REGISTRASI */}
           {step === 'register' && (
             <motion.form key="register" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onSubmit={handleRegisterSubmit}>
-              <h2 className="text-3xl font-bold text-[#4A3B32] mb-2 text-center" style={{ fontFamily: 'Playfair Display' }}>
+              <h2 className="text-3xl font-bold text-[#492828] mb-2 text-center" style={{ fontFamily: 'Playfair Display' }}>
                 Daftar Akun Baru
               </h2>
-              <p className="text-sm text-center text-[#8B5A2B] mb-6">Bergabunglah dalam ekosistem SEAPEDIA</p>
+              <p className="text-sm text-center text-[#84934A] mb-6">Bergabunglah dalam ekosistem SEAPEDIA</p>
               
               {errorMessage && <p className="text-red-600 text-sm font-bold text-center mb-4">{errorMessage}</p>}
               
@@ -153,7 +157,7 @@ export default function Login() {
               <OrganicInput label="Kata Sandi" type="password" placeholder="Minimal 6 karakter" value={formData.password} onChange={(e) => handleChange(e, 'password')} />
 
               <div className="mb-4">
-                <label className="text-[#4A3B32] mb-2 block font-bold" style={{ fontFamily: 'Playfair Display' }}>
+                <label className="text-[#492828] mb-2 block font-bold" style={{ fontFamily: 'Playfair Display' }}>
                   Daftar Sebagai
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -164,24 +168,24 @@ export default function Login() {
                       onClick={() => setFormData({ ...formData, role: opt.value })}
                       className={`p-3 rounded-tl-lg rounded-br-lg border-2 text-xs font-bold transition-all duration-300 ${
                         formData.role === opt.value
-                          ? 'bg-[#8B5A2B] border-[#8B5A2B] text-[#F4ECD8] shadow-md'
-                          : 'border-[#8B5A2B]/30 text-[#4A3B32] bg-white/50 hover:border-[#8B5A2B]'
+                          ? 'bg-[#84934A] border-[#84934A] text-[#ECECEC] shadow-md'
+                          : 'border-[#84934A]/30 text-[#492828] bg-white/50 hover:border-[#84934A]'
                       }`}
                     >
                       {opt.label}
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-[#8B5A2B] mt-2">Peran lain bisa ditambahkan nanti dari Dashboard.</p>
+                <p className="text-xs text-[#84934A] mt-2">Peran lain bisa ditambahkan nanti dari Dashboard.</p>
               </div>
               
               <RootButton type="submit" className="w-full mt-2" disabled={isSubmitting}>
                 {isSubmitting ? 'Mendaftarkan...' : 'Selesaikan Registrasi'}
               </RootButton>
               
-              <p className="text-sm text-center text-[#4A3B32] mt-6">
+              <p className="text-sm text-center text-[#492828] mt-6">
                 Sudah punya akun?{' '}
-                <button type="button" onClick={() => { setStep('login'); setErrorMessage(''); }} className="font-bold text-[#8B5A2B] underline hover:text-[#4A3B32]">
+                <button type="button" onClick={() => { setStep('login'); setErrorMessage(''); }} className="font-bold text-[#84934A] underline hover:text-[#492828]">
                   Masuk Kembali
                 </button>
               </p>
@@ -192,10 +196,10 @@ export default function Login() {
           {step === 'role_selection' && (
             <motion.form key="roles" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onSubmit={handleRoleFinalize} className="space-y-5">
               <div className="text-center mb-4">
-                <h2 className="text-2xl font-bold text-[#4A3B32]" style={{ fontFamily: 'Playfair Display' }}>
+                <h2 className="text-2xl font-bold text-[#492828]" style={{ fontFamily: 'Playfair Display' }}>
                   Pilih Peran Sesi Ini
                 </h2>
-                <p className="text-sm text-[#8B5A2B] mt-2 leading-relaxed">
+                <p className="text-sm text-[#84934A] mt-2 leading-relaxed">
                   Akun Anda terdeteksi memiliki lebih dari satu peran non-admin. Harap pilih salah satu peran untuk mengaktifkan halaman rute privat.
                 </p>
               </div>
@@ -210,8 +214,8 @@ export default function Login() {
                     onClick={() => { setSelectedRole(role); setErrorMessage(""); }}
                     className={`p-4 rounded-tl-[1.5rem] rounded-br-[1.5rem] font-bold border-2 transition-all duration-300 text-left pl-6 ${
                       selectedRole === role 
-                      ? 'bg-[#8B5A2B] border-[#8B5A2B] text-[#F4ECD8] shadow-md scale-[1.02]' 
-                      : 'border-[#8B5A2B]/30 text-[#4A3B32] hover:border-[#8B5A2B] bg-white/50'
+                      ? 'bg-[#84934A] border-[#84934A] text-[#ECECEC] shadow-md scale-[1.02]' 
+                      : 'border-[#84934A]/30 text-[#492828] hover:border-[#84934A] bg-white/50'
                     }`}
                     style={{ fontFamily: 'Playfair Display' }}
                   >

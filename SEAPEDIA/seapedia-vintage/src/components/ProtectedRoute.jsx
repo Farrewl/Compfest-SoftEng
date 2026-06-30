@@ -11,7 +11,7 @@ export default function ProtectedRoute({ children, allowedRoles }) {
   if (isCheckingSession) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <p className="text-[#8B5A2B] italic animate-pulse">Memeriksa sesi...</p>
+        <p className="text-[#84934A] italic animate-pulse">Memeriksa sesi...</p>
       </div>
     );
   }
@@ -28,10 +28,10 @@ export default function ProtectedRoute({ children, allowedRoles }) {
           <h2 className="text-2xl font-bold text-red-700 mb-2" style={{ fontFamily: 'Playfair Display' }}>
             Akses Ditolak
           </h2>
-          <p className="text-[#4A3B32] mb-2 text-sm">
+          <p className="text-[#492828] mb-2 text-sm">
             Halaman ini hanya untuk role: {allowedRoles.join(', ')}.
           </p>
-          <p className="text-[#8B5A2B] text-xs font-bold">Role aktif Anda saat ini: {activeRole}</p>
+          <p className="text-[#84934A] text-xs font-bold">Role aktif Anda saat ini: {activeRole}</p>
         </OrganicCard>
       </div>
     );

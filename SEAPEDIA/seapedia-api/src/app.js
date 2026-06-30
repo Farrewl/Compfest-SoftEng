@@ -8,6 +8,8 @@ import rateLimit from 'express-rate-limit';
 import { notFound, errorHandler } from './middleware/errorHandler.js';
 import authRoutes from './modules/auth/auth.routes.js';
 import reviewRoutes from './modules/review/review.routes.js';
+import storeRoutes from './modules/store/store.routes.js';
+import productRoutes from './modules/product/product.routes.js';
 
 const app = express();
 
@@ -57,6 +59,8 @@ app.get('/api/health', (req, res) => {
 // ===========================================================
 app.use('/api/auth', authRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/stores', storeRoutes);
+app.use('/api/products', productRoutes);
 
 // 404 handler + error handler terpusat - WAJIB paling akhir
 app.use(notFound);

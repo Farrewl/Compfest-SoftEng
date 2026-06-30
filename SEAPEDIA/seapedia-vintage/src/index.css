@@ -1,26 +1,44 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
 
-/* Pengaturan dasar menggunakan CSS murni agar warna kertas langsung muncul */
-body {
-  background-color: #F4ECD8 !important; /* Warna dasar kertas tua */
-  color: #4A3B32;  /* Warna gelap kulit pohon */
-  font-family: 'Inter', sans-serif;
-  margin: 0;
-  background-image: url('data:image/svg+xml,%3Csvg width="100" height="100" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M10 100 Q 30 50 50 100 T 90 100" stroke="%238B5A2B0F" fill="none" stroke-width="1.5"/%3E%3C/svg%3E');
+/* ====================================================================
+   SEAPEDIA - Design Tokens (Vintage Botanical)
+   Palet resmi: kertas abu lembut, sage olive, olive gelap, dan
+   maroon tua, dengan emas antik sebagai aksen pelengkap.
+   Terdaftar lewat @theme Tailwind v4, jadi otomatis tersedia sebagai
+   utility class: bg-paper, text-ink, bg-primary, border-gold, dst.
+   File baru ke depan dianjurkan pakai class ini, bukan hex manual.
+   ==================================================================== */
+@theme {
+  --color-paper: #ECECEC;       /* latar halaman - kertas linen pudar */
+  --color-ink: #492828;         /* teks utama & permukaan gelap - maroon tua */
+  --color-primary: #84934A;     /* aksen utama / CTA - sage olive */
+  --color-primary-deep: #656D3F;/* aksen sekunder / hover - olive gelap */
+  --color-gold: #C2A14D;        /* aksen dekoratif - emas antik */
 }
 
-/* Custom Scrollbar kuno */
+/* Pengaturan dasar menggunakan CSS murni agar warna kertas langsung muncul */
+body {
+  background-color: #ECECEC !important; /* Kertas linen pudar */
+  color: #492828; /* Tinta maroon tua */
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  /* Motif sulur & daun tipis - menggantikan motif pipa abstrak,
+     supaya tekstur latar terasa botani, bukan mekanis. */
+  background-image: url('data:image/svg+xml,%3Csvg width="140" height="140" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M15 130 Q 35 90 25 60 Q 15 35 35 15" stroke="%23656D3F14" fill="none" stroke-width="1.5"/%3E%3Cpath d="M27 95 Q 45 90 50 102" stroke="%23656D3F14" fill="none" stroke-width="1.2"/%3E%3Cellipse cx="49" cy="104" rx="6" ry="3" fill="%2384934A18" transform="rotate(35 49 104)"/%3E%3Cpath d="M22 65 Q 5 60 3 72" stroke="%23656D3F14" fill="none" stroke-width="1.2"/%3E%3Cellipse cx="4" cy="70" rx="6" ry="3" fill="%2384934A18" transform="rotate(-25 4 70)"/%3E%3Cpath d="M30 35 Q 48 32 52 44" stroke="%23656D3F14" fill="none" stroke-width="1.2"/%3E%3Cellipse cx="51" cy="46" rx="5" ry="2.5" fill="%2384934A18" transform="rotate(30 51 46)"/%3E%3C/svg%3E');
+}
+
+/* Custom Scrollbar bertema botani */
 ::-webkit-scrollbar {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #F4ECD8; 
+  background: #ECECEC;
 }
 ::-webkit-scrollbar-thumb {
-  background: #8B5A2B; 
+  background: #84934A;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #4A3B32; 
+  background: #492828;
 }
